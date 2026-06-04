@@ -3,9 +3,9 @@
 | Trường            | Giá trị                           |
 | ------------------ | -------------------------------- |
 | **Module**         | M2 — BA Documentation Generator  |
-| **Phiên bản**      | 3.0                              |
+| **Phiên bản**      | 4.0                              |
 | **Ngày tạo**       | 02/05/2026                       |
-| **Ngày cập nhật**  | 02/06/2026                       |
+| **Ngày cập nhật**  | 04/06/2026                       |
 | **Trạng thái**     | Draft                            |
 | **Owner**          | [TBD]                            |
 | **Liên quan**      | PRD v1.3 §6.2, §10 (Milestone 2); ADR-001 (Markdown-First); Module M1 PRD |
@@ -125,11 +125,12 @@ Vì vậy M2 phải:
 │ Step 5: Generate Diagrams + Screen Specification             │
 │ Actor: BA chọn diagram type → ANSO sinh                      │
 │ Diagrams (PlantUML):                                         │
-│   - Use case diagram                                         │
-│   - ERD (Entity Relationship Diagram)                        │
-│   - Sequence diagram cho luồng quan trọng                    │
-│   - State machine nếu có entity với state                    │
-│   - Sitemap (auto-generated)                                 │
+│   - SM-NNN: Sitemap (auto-generated)                         │
+│   - UC-NNN: Use case diagram                                 │
+│   - ERD-NNN: ERD (Entity Relationship Diagram)               │
+│   - SEQ-NNN: Sequence diagram cho luồng quan trọng           │
+│   - AD-NNN: Activity diagram cho luồng có nhiều nhánh        │
+│   - STM-NNN: State machine nếu có entity với state           │
 │ Screen Specification:                                        │
 │   - SCREEN-XXX.md per màn hình                               │
 │ Output: anso-docs/02-ba/diagrams/*.puml + render PNG/SVG     │
@@ -292,7 +293,7 @@ glossary.md
 | Functional Requirements | `requirements/REQ-NNN.md`                | `FunctionalRequirements_001.md`     |
 | User Stories           | `user-stories/US-NNN.md`                 | `UserStories_001.md`                |
 | Non-Functional Requirements | `non-functional-requirement/NFR-NNN.md`  | `NonFunctionalRequirements_001.md`  |
-| Diagrams               | `[Tên diagrams]_NNN/*.puml`              | `diagrams.zip`       |
+| Diagrams               | `diagrams/[TYPE]-NNN.puml`               | `diagrams.zip`                      |
 | Screen Specification   | `screen-spec/SCREEN-NNN.md`              | `ScreenSpec_001.xlsx`               |
 | Glossary               | `glossary.md`                            | `Glossary_001.md`                   |
 | Prototype              | `prototype/*.jsx`                        | `Prototype_001.jsx`                 |
@@ -316,11 +317,10 @@ created_by: ba-generator-agent
 updated_by: lan.ba
 schema_version: 1
 
-# Requirement-specific
-category: functional          # functional | non_functional
-sub_category: security        # nullable: security | performance | usability | reliability...
-priority: must                # must | should | could | wont (MoSCoW)
-source: client_brief          # client_brief | bd_team | regulation | technical | ba_inferred
+category: functional
+sub_category: security
+priority: must
+source: client_brief
 source_ref:
   - type: brief
     section: "2.3 Security Requirements"
@@ -329,24 +329,21 @@ source_ref:
 owner: lan.ba
 priority_rationale: "MUST do — security baseline yêu cầu bởi GDPR-equivalent compliance"
 
-# Linkage (auto-maintained)
 parent_requirement: null
 child_requirements: []
 related_user_stories: [US-001, US-002]
 related_test_cases: [TC-031]
-related_tasks: []             # populated khi M4 sinh task
+related_tasks: []
 related_screens: [SCREEN-001]
 
-# Validation flags
 validation:
   has_acceptance_criteria: true
   has_owner: true
-  is_unambiguous: true        # auto-detected by ANSO
+  is_unambiguous: true
   is_verifiable: true
   is_testable: true
   conflicts_with: []
 
-# Bilingual support
 translations:
   vi:
     title: "Hệ thống phải xác thực email/password qua bcrypt"
@@ -425,30 +422,25 @@ created_by: ba-generator-agent
 updated_by: lan.ba
 schema_version: 1
 
-# Story-specific (INVEST)
 epic: EP-001
-priority: high                # low | medium | high | critical
-story_points: 5               # Fibonacci: 1, 2, 3, 5, 8, 13
+priority: high
+story_points: 5
 persona: end_user
 business_value: high
 
-# Linkage
 related_requirements: [REQ-014, REQ-015]
 related_test_cases: [TC-031, TC-032]
-related_tasks: []             # populated khi M4 sinh task
+related_tasks: []
 related_screens: [SCREEN-001]
 parent_epic: EP-001
 depends_on: []
 
-# AC count tracking
 acceptance_criteria_count: 3
 
-# Implementation hints (optional, for dev agent)
 suggested_components: ["LoginForm", "AuthService"]
 
 labels: [auth, mvp]
 
-# Bilingual support
 translations:
   vi:
     title: "User đăng nhập bằng email và mật khẩu"
@@ -570,29 +562,49 @@ NFR thường ít hơn requirements (10-30 NFR cho dự án trung). Tách `nfr.m
 
 | Type           | File                              | Sinh từ                          |
 | -------------- | --------------------------------- | -------------------------------- |
-| Use Case       | `diagrams/usecase.puml`           | User stories + actors            |
-| ERD            | `diagrams/erd.puml`               | Entity definitions trong REQ     |
-| Sequence       | `diagrams/sequence-{flow}.puml`   | AC steps của user story          |
-| State machine  | `diagrams/state-{entity}.puml`    | Entity có field `status` enum    |
-| Sitemap        | `diagrams/sitemap.puml`           | Auto-generated từ screen-spec    |
+| Sitemap        | `diagrams/SM-NNN.puml`            | Auto-generated từ screen-spec    |
+| Use Case       | `diagrams/UC-NNN.puml`            | User stories + actors            |
+| ERD            | `diagrams/ERD-NNN.puml`           | Entity definitions trong REQ     |
+| Sequence       | `diagrams/SEQ-NNN-{flow}.puml`    | AC steps của user story          |
+| Activity       | `diagrams/AD-NNN-{flow}.puml`     | Luồng nghiệp vụ có nhiều nhánh   |
+| State machine  | `diagrams/STM-NNN-{entity}.puml`  | Entity có field `status` enum    |
 
 #### 3.5.2. Schema (front matter tách `.meta.yaml` cạnh `.puml`)
 
 ```yaml
 ---
-id: DIAG-001
+id: UC-001
 type: diagram
-diagram_type: usecase         # usecase | erd | sequence | state | sitemap
+diagram_type: usecase
 title: ACME HR — Use Case Overview
 version: 1
-auto_generated: true          # true nếu sinh từ user stories; false nếu BA edit thủ công
+auto_generated: true
 generation_strategy: from_user_stories
 created_at: ...
 updated_at: ...
 ---
 ```
 
-#### 3.5.3. Ví dụ Use Case Diagram
+#### 3.5.3. Ví dụ Sitemap (SM-001)
+
+```plantuml
+@startuml
+left to right direction
+
+rectangle "ACME HR" {
+  [Login] --> [Dashboard]
+  [Dashboard] --> [Employee Profile]
+  [Dashboard] --> [Leave Management]
+  [Dashboard] --> [Admin Panel]
+  [Leave Management] --> [Submit Request]
+  [Leave Management] --> [Approve Requests]
+  [Admin Panel] --> [Manage Users]
+  [Admin Panel] --> [Reports]
+}
+@enduml
+```
+
+#### 3.5.4. Ví dụ Use Case Diagram (UC-001)
 
 ```plantuml
 @startuml
@@ -619,7 +631,7 @@ admin --> UC5
 @enduml
 ```
 
-#### 3.5.4. Ví dụ ERD (Entity Relationship Diagram)
+#### 3.5.5. Ví dụ ERD (ERD-001)
 
 ```plantuml
 @startuml
@@ -659,7 +671,7 @@ Employee }o--|| Employee : manages
 @enduml
 ```
 
-#### 3.5.5. Ví dụ Sequence Diagram
+#### 3.5.6. Ví dụ Sequence Diagram (SEQ-001)
 
 ```plantuml
 @startuml
@@ -686,28 +698,63 @@ end
 @enduml
 ```
 
-#### 3.5.6. Ví dụ Sitemap
+#### 3.5.7. Ví dụ Activity Diagram (AD-001)
 
 ```plantuml
 @startuml
-left to right direction
+start
 
-rectangle "ACME HR" {
-  [Login] --> [Dashboard]
-  [Dashboard] --> [Employee Profile]
-  [Dashboard] --> [Leave Management]
-  [Dashboard] --> [Admin Panel]
-  [Leave Management] --> [Submit Request]
-  [Leave Management] --> [Approve Requests]
-  [Admin Panel] --> [Manage Users]
-  [Admin Panel] --> [Reports]
-}
+:Employee nộp Leave Request;
+
+if (Có overlap với request hiện tại?) then (yes)
+  :Reject — hiển thị "Overlap with existing request";
+  stop
+endif
+
+if (Số ngày > 30?) then (yes)
+  :Reject — hiển thị "Exceeded max 30 days per request";
+  stop
+endif
+
+:Gửi thông báo đến Manager;
+
+fork
+  :Manager review request;
+  if (Manager approve?) then (yes)
+    :Status → Approved;
+    :Gửi email xác nhận cho Employee;
+  else (no)
+    :Status → Rejected;
+    :Gửi email từ chối cho Employee;
+  endif
+fork again
+  :Đợi 5 ngày (timeout);
+  :Escalate lên manager.manager;
+end fork
+
+stop
 @enduml
 ```
 
-#### 3.5.7. Quy tắc
+#### 3.5.8. Ví dụ State Machine (STM-001)
 
-- File `.puml` lưu source; rendered SVG/PNG sinh khi commit (CI step).
+```plantuml
+@startuml
+[*] --> Draft : Employee tạo request
+
+Draft --> Submitted : Employee submit
+Submitted --> UnderReview : Manager mở xem
+UnderReview --> Approved : Manager approve
+UnderReview --> Rejected : Manager reject
+Submitted --> Escalated : Timeout 5 ngày
+Escalated --> Approved : Manager cấp trên approve
+Escalated --> Rejected : Manager cấp trên reject
+Approved --> [*]
+Rejected --> [*]
+@enduml
+```
+
+#### 3.5.9. Quy tắc
 - `auto_generated: true` → ANSO có thể overwrite khi regenerate. BA edit thủ công → set `false`.
 - Diff diagram trong PR review = diff text PlantUML, không phải image.
 - Export: tất cả `.puml` + rendered SVG/PNG gộp thành `Diagrams_NNN.zip`.
@@ -716,7 +763,7 @@ rectangle "ACME HR" {
 
 **Vai trò:** Đặc tả chi tiết từng màn hình — component, user action, happy path, bad scenario, validation rules, linking, bug tracking.
 
-#### 3.6.1. Schema (YAML front matter — đọc bởi AI/backend)
+#### 3.6.1. Schema (YAML front matter)
 
 ```yaml
 ---
@@ -740,7 +787,7 @@ export_format: xlsx
 ---
 ```
 
-#### 3.6.2. Body (markdown — hiển thị trên UI)
+#### 3.6.2. Body (markdown — render trên UI trong tab Screen Specification)
 
 Header metadata hiển thị dạng:
 
@@ -765,6 +812,8 @@ Bảng spec:
 #### 3.6.3. Quy tắc
 
 - ID format `SCREEN-NNN`.
+- **Tab Screen Specification trong workspace:** hiển thị từng module một. BA dùng panel chuyển module để navigate giữa các module khác nhau.
+- **Visibility folder:** file `.zip` chứa toàn bộ screen spec (tất cả module) xuất hiện trong visibility folder khi export.
 - **Export:** Tất cả màn trong cùng 1 module → 1 file `ScreenSpec_NNN.xlsx`, mỗi màn = 1 sheet. Format giống mẫu Excel chuẩn (header metadata + bảng cột đầy đủ).
 - YAML front matter là phần AI/backend đọc. Body markdown là phần BA edit và UI render.
 - Sitemap tự động sinh từ `route` field trong front matter của các SCREEN files.
@@ -821,17 +870,15 @@ title: Update password complexity — detected from QA test case change
 version: 1
 created_at: 2026-06-15T10:00:00Z
 updated_at: 2026-06-15T16:00:00Z
-created_by: anso-system          # auto-created by system
+created_by: anso-system
 updated_by: lan.ba
 schema_version: 1
 
-# CR-specific
-trigger_source: qa               # qa | dev — module phát sinh thay đổi
+trigger_source: qa
 trigger_file: test-cases/TC-031.md
-change_type: modification        # addition | modification | deletion
+change_type: modification
 target_artifact: REQ-014
 
-# Impact analysis (auto-computed)
 impact_summary:
   affected_requirements: [REQ-014]
   affected_user_stories: [US-001, US-002, US-005]
@@ -843,8 +890,7 @@ impact_summary:
       suggested: "Password minimum length: 12 characters, must include at least 1 uppercase, 1 lowercase, 1 digit, 1 special character"
       confidence: 0.91
 
-# BA decision
-ba_decision: null               # null | accepted | rejected | manual
+ba_decision: null
 decision_at: null
 decision_by: null
 applied_at: null
@@ -917,13 +963,13 @@ related_artifacts:
   - type: prototype
     path: prototype/
 
-stats:                          # auto-computed
+stats:
   total_requirements: 47
   total_user_stories: 23
   total_acceptance_criteria: 89
   total_diagrams: 12
   total_screens: 8
-  validation_status: passing    # passing | warning | failing
+  validation_status: passing
 ---
 
 # Software Requirements Specification: ACME ERP HR
@@ -1137,11 +1183,12 @@ Process:
 
 **Strategy:**
 
+- Sitemap: từ `route` field trong tất cả SCREEN front matter — tự động sinh, update khi screen spec thay đổi.
 - Use Case: từ user stories, actors từ persona.
 - ERD: từ entity definitions trong requirements (extracted automatically).
 - Sequence: từ AC steps của user story (1 sequence cho 1-2 luồng quan trọng).
+- Activity: từ luồng nghiệp vụ có nhiều nhánh điều kiện, fork/join — BA chọn khi flow phức tạp hơn sequence.
 - State machine: nếu entity có field `status` enum.
-- Sitemap: từ `route` field trong tất cả SCREEN front matter — tự động sinh, update khi screen spec thay đổi.
 
 **Acceptance Criteria:**
 
@@ -1150,6 +1197,7 @@ Process:
 - AC-2.6.3: Khi REQ thay đổi, diagram tự re-render trong commit pipeline.
 - AC-2.6.4: BA edit thủ công flag `auto_generated: false` → ANSO không overwrite.
 - AC-2.6.5: Sitemap tự cập nhật khi thêm/xoá SCREEN file.
+- AC-2.6.6: Activity diagram sinh được từ luồng có ≥ 2 nhánh điều kiện trong AC của user story.
 
 ### 4.7. F2.7 — Prototype Generation
 
@@ -1193,7 +1241,7 @@ Process:
 | User Stories           | `.md`                         | `.md`                              |
 | Non-Functional Requirements | `.md`                    | `.md`                              |
 | Diagrams               | `.puml` (full, per file)      | `.zip` (all .puml + rendered PNG)  |
-| Screen Specification   | `.md`                         | `.xlsx` (multi-sheet per module)   |
+| Screen Specification   | `.md` (per module, panel chuyển module) | `.xlsx` (per module) / `.zip` (tất cả module, visibility folder) |
 | Glossary               | `.md`                         | `.md`                              |
 | Prototype              | `.html` (preview)             | `.jsx`                             |
 | SRS                    | `.md` (advance screen only)   | `.md`                              |
@@ -1265,14 +1313,19 @@ ANSO Control Plane
         ├── Diagrams
         │   ├── Gallery view với render preview
         │   ├── Click → split: source code | rendered
-        │   ├── Sitemap (auto-generated, cập nhật khi screen spec thay đổi)
+        │   ├── SM-NNN: Sitemap (auto-generated, cập nhật khi screen spec thay đổi)
+        │   ├── UC-NNN: Use Case Diagram
+        │   ├── ERD-NNN: Entity Relationship Diagram
+        │   ├── SEQ-NNN: Sequence Diagram
+        │   ├── AD-NNN: Activity Diagram
+        │   ├── STM-NNN: State Machine
         │   ├── "Regenerate" button (cho auto-generated diagrams)
         │   └── Edit source (with PlantUML lint)
         │
         ├── Screen Specification
-        │   ├── List view theo module
+        │   ├── Hiển thị theo từng module, có panel chuyển module
         │   ├── SCREEN detail page — markdown view + preview
-        │   └── Export → ScreenSpec_NNN.xlsx
+        │   └── Export → ScreenSpec_NNN.xlsx (per module) | .zip (tất cả module)
         │
         ├── Glossary
         │   └── Term table với search, edit
@@ -1454,7 +1507,7 @@ Khi `POST /workspaces/{id}/m2/advance` được gọi:
 | ------ | -------------------------------------------------------------------- | --------------------------------- |
 | **W1** | Schema v1 finalized + parser library + validation engine skeleton    | V-001 → V-016 logic               |
 | **W2** | BA Generator agent (REQ + US + NFR generation từ M1 input)           | AC-2.1.1, AC-2.1.2, AC-2.1.3     |
-| **W3** | Diagram generation (Use Case + ERD + Sitemap) + Screen Spec skeleton | AC-2.6.x, AC-2.1.6               |
+| **W3** | Diagram generation (SM + UC + ERD + SEQ + AD) + Screen Spec skeleton | AC-2.6.x, AC-2.1.6               |
 | **W4** | BA Copilot Q&A + Prototype generation + UI form mode                 | AC-2.2.x, AC-2.7.x               |
 | **W5** | Change Request auto-detect workflow + Impact Analysis                | AC-2.4.x                         |
 | **W6** | Bilingual + Export formats + SRS generation + Advance flow + Polish  | AC-2.8.x, AC-2.9.x, AC-2.10.x   |
@@ -1548,7 +1601,10 @@ Khi `POST /workspaces/{id}/m2/advance` được gọi:
 | D15 | Prototype deliver dạng ReactJS (.jsx export)            | HTML preview trên UI             | §3.10      |
 | D16 | Versioning: version tăng mỗi lần BA save file           | File export có suffix `_NNN`     | §3.1       |
 | D17 | Tham chiếu nội bộ dùng tên gốc không có version        | `requirement.md`, `userstory.md` | §3.1       |
-| D18 | Sitemap gộp vào tab Diagrams, template riêng, auto-sinh | Từ route field trong screen spec | §3.5       |
+| D18 | Sitemap gộp vào tab Diagrams, template riêng, auto-sinh | Từ route field trong screen spec; mã SM-NNN | §3.5 |
+| D19 | Diagram naming convention chuẩn hoá theo mã type | UC-NNN, ERD-NNN, SEQ-NNN, AD-NNN, STM-NNN, SM-NNN | §3.5.1 |
+| D20 | Activity Diagram thêm vào bộ diagram types | Dùng cho luồng có nhiều nhánh điều kiện, fork/join | §3.5 |
+| D21 | Screen Spec visibility folder export dạng .zip | Per module = .xlsx; tất cả module = .zip trong visibility folder | §3.6.3 |
 
 ### 10.2. Decisions còn pending
 
@@ -1638,6 +1694,7 @@ M2 nên được re-evaluate (PRD revision) nếu:
 - **MoSCoW** — Must/Should/Could/Won't priority.
 - **INVEST** — Independent/Negotiable/Valuable/Estimable/Small/Testable.
 - **Sitemap** — diagram thể hiện cấu trúc navigation của hệ thống, auto-sinh từ screen spec.
+- **Activity Diagram** — diagram UML thể hiện luồng nghiệp vụ có nhiều nhánh điều kiện, fork/join; dùng khi flow phức tạp hơn sequence diagram.
 - **Screen Specification** — đặc tả chi tiết từng màn hình theo component, action, outcome.
 
 ### 14.2. Sample BA Copilot conversation
